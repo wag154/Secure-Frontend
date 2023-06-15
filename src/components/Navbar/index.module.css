@@ -1,0 +1,32 @@
+*{
+    margin: 0;
+}
+.ulcontainer{
+    display: flex;
+    align-items: center;
+}
+.account{
+    text-align: center;
+    position: absolute;
+    right : 5%;
+}
+.optcontainer{
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    margin-right: 15%;
+    margin-left: 5%;
+    width : 80%;
+    height : 100%;
+}
+.navcontainer{
+    text-decoration: none;
+    position: relative;
+    margin : 1vw;
+    width : 98vw;
+    height : 5vh;
+    display : flex;
+    background-color: yellow;
+    justify-content: space-around;
+    align-items: center;
+}
