@@ -1,50 +1,17 @@
 import React,{useEffect, useState} from 'react'
 import styles from "./index.module.css"
 import { useNavigate } from 'react-router-dom'
+import { usePassCode } from '../../Context'
 export default function Access() {
   const [isNew , setNew] = useState(true)
-  const [passCode, setPassCode] = useState("")
+  const [DispassCode, setDisPassCode] = useState("")
   const [tempPassCode, setTempPassCode] = useState("")
-  const [isleaving , setisleaving] = useState(false)
   const [displayCode , setDisplayCode] = useState(false)
+  
   const navigate = useNavigate();
-  const checkPassCode = async()=>{
-    try{
-      console.log(isNew)
-      if (isNew == true){
-        setNew(!isNew)
-        console.log("sending post req")
-        const options = {
-          method : "POST",
-          headers : {
-            "content-type" : "application/json"
-          },
-          body : JSON.stringify({
-            password  : passCode
-          })
-        }
-        try{
-          const resp = await fetch ("http://127.0.0.1:5000/user/check",options)
-          if (resp.ok){
-            setisleaving(true)
-            setTempPassCode("")
-            setNew(true)
-            setPassCode("")
-            navigate("/")
-          }
-          else{
-            
-          }
-        }
-        catch (e){
-          throw new Error(e)
-        }
-      }
-    }
-    catch(e){
-      throw new Error(e)
-    }
-  }
+  
+  const { passCode , updatePassCode } = usePassCode();
+  
   const getPassCode = async()=>{
     try{
       const options = {
@@ -56,18 +23,57 @@ export default function Access() {
       const resp = await fetch("http://127.0.0.1:5000/user/create",options)
       if (resp.ok){
         const data = await resp.json()
-        setPassCode(data["code"]+"|"+data["password"])
+        setDisPassCode(data["code"]+"|"+data["password"])
+        updatePassCode(data["code"]+"|"+data["password"])
         setTempPassCode(data["code"] + "|" + data["password"])
       }
       else{
-        setPassCode("Error setting pass code")
+        setDisPassCode("Error setting pass code")
       }
     }
     catch(e){
-      setPassCode("Server Error setting pass code")
+      setDisPassCode("Server Error setting pass code")
       throw new Error(e)
     }
-    setDisplayCode(false)
+    setTimeout(() => {
+      setDisplayCode(false)
+      setNew(true)
+    }, 5000);
+
+  }
+  const checkPassCode = async()=>{
+    console.log(tempPassCode)
+    try{
+      if (isNew == true){
+        const options = {
+          method : "POST",
+          headers : {
+            "content-type" : "application/json"
+          },
+          body : JSON.stringify({
+            password  : tempPassCode
+          })
+        }
+        try{
+          const resp = await fetch ("http://127.0.0.1:5000/user/check",options)
+          if (resp.ok){
+            updatePassCode(tempPassCode)
+            setTempPassCode("")
+            setNew(true)
+            navigate("/")
+          }
+          else{
+            alert("pass code is wrong")
+          }
+        }
+        catch (e){
+          throw new Error(e)
+        }
+      }
+    }
+    catch(e){
+      throw new Error(e)
+    }
   }
     const handleChange = async(e)=>{
       setTempPassCode(e.target.value)
@@ -78,20 +84,23 @@ export default function Access() {
 
       <div className={styles.maincontainer}>
         <div className={styles.entercontainer} >
-          <p1 className ={styles.passtitle}> {isNew && isleaving == false ?  "Pass Code" : "Generated Pass Code"} </p1>
+          <p1 className ={styles.passtitle}> {!isNew  == false ?  "Pass Code" : "Generate Pass Code"} </p1>
           { isNew ? (<>
           <input className={styles.passcode} onChange={(e)=>{handleChange(e)}} placeholder={Array(tempPassCode.length).fill('*').join('')}/>
           <p1 className={styles.createaccount}>Want to <button className={styles.createbutton} onClick={()=>{setNew(!isNew)}}>Create</button> an account?</p1>
+          <button className={styles.loginbtn} onClick={()=>{checkPassCode();}}>Login</button>
           </>
-          ) :  displayCode == false ? <button className={styles.genpas} onClick={()=>{setDisplayCode(!displayCode); getPassCode();}}>Generate Password</button>: passCode != "" ? <p1 className = {styles.displayPassCode}>{passCode}</p1> :<p1 className = {styles.displayPassCode}>Loading . . .</p1> }
-        <button className={styles.loginbtn} onClick={()=>{checkPassCode();}}>Login</button>
+          ) : displayCode == false ? <>
+          <p1 className ={styles.timerwarning}>Pass Code will disappear after 5 seconds</p1><button className={styles.genpas} onClick={()=>{setDisplayCode(!displayCode); getPassCode();}}>Gen Pass Code</button>
+          </>
+          : passCode != "" ? <p1 className = {styles.displayPassCode}>{DispassCode}</p1> :<p1 className = {styles.displayPassCode}>Loading . . .</p1> }
+          
         </div>
       </div>
     </div>
     </>
   )
 }
-
       // <div className={styles.informationcontainer}>
       //   <div className={styles.informationdis}>
 
