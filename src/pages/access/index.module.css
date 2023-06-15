@@ -52,6 +52,13 @@
     font-family: 'Tilt Warp', cursive;
     font-size: 2em;
 }
+.genpas {
+    border: rgb(184, 184, 184) solid 1px;
+    background-color: white;
+    height : 2vh;
+    width : 15vw;
+    font-size: 1.5em;
+}
 .passcode {
     border-radius: 5px;
     border: rgb(184, 184, 184) solid 1px;

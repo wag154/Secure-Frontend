@@ -5,11 +5,14 @@ export default function Access() {
   const [isNew , setNew] = useState(true)
   const [passCode, setPassCode] = useState("")
   const [tempPassCode, setTempPassCode] = useState("")
+  const [isleaving , setisleaving] = useState(false)
+  const [displayCode , setDisplayCode] = useState(false)
   const navigate = useNavigate();
   const checkPassCode = async()=>{
     try{
       console.log(isNew)
       if (isNew == true){
+        setNew(!isNew)
         console.log("sending post req")
         const options = {
           method : "POST",
@@ -23,8 +26,14 @@ export default function Access() {
         try{
           const resp = await fetch ("http://127.0.0.1:5000/user/check",options)
           if (resp.ok){
-            console.log("its good")
+            setisleaving(true)
+            setTempPassCode("")
+            setNew(true)
+            setPassCode("")
             navigate("/")
+          }
+          else{
+            
           }
         }
         catch (e){
@@ -58,14 +67,8 @@ export default function Access() {
       setPassCode("Server Error setting pass code")
       throw new Error(e)
     }
+    setDisplayCode(false)
   }
-    useEffect(()=>{
-      getPassCode()
-    },[isNew])
-    useEffect(()=>{
-      getPassCode()
-    },[])
-
     const handleChange = async(e)=>{
       setTempPassCode(e.target.value)
     }
@@ -75,13 +78,13 @@ export default function Access() {
 
       <div className={styles.maincontainer}>
         <div className={styles.entercontainer} >
-          <p1 className ={styles.passtitle}> {isNew ?  "Pass Code" : "Generated Pass Code"} </p1>
+          <p1 className ={styles.passtitle}> {isNew && isleaving == false ?  "Pass Code" : "Generated Pass Code"} </p1>
           { isNew ? (<>
           <input className={styles.passcode} onChange={(e)=>{handleChange(e)}} placeholder={Array(tempPassCode.length).fill('*').join('')}/>
           <p1 className={styles.createaccount}>Want to <button className={styles.createbutton} onClick={()=>{setNew(!isNew)}}>Create</button> an account?</p1>
           </>
-          ) : passCode != "" ? <p1 className = {styles.displayPassCode}>{passCode}</p1> :<p1 className = {styles.displayPassCode}>Loading . . .</p1> }
-        <button className={styles.loginbtn} onClick={()=>{setNew(!isNew);checkPassCode();}}>Login</button>
+          ) :  displayCode == false ? <button className={styles.genpas} onClick={()=>{setDisplayCode(!displayCode); getPassCode();}}>Generate Password</button>: passCode != "" ? <p1 className = {styles.displayPassCode}>{passCode}</p1> :<p1 className = {styles.displayPassCode}>Loading . . .</p1> }
+        <button className={styles.loginbtn} onClick={()=>{checkPassCode();}}>Login</button>
         </div>
       </div>
     </div>
