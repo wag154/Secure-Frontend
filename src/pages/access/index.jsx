@@ -2,6 +2,7 @@ import React,{useEffect, useState} from 'react'
 import styles from "./index.module.css"
 import { useNavigate } from 'react-router-dom'
 import { usePassCode } from '../../Context'
+import {decryptData} from "../../../encrypt"
 export default function Access() {
   const [isNew , setNew] = useState(true)
   const [DispassCode, setDisPassCode] = useState("")
@@ -22,7 +23,16 @@ export default function Access() {
       }
       const resp = await fetch("http://127.0.0.1:5000/user/create",options)
       if (resp.ok){
-        const data = await resp.json()
+        const encrypted = await resp.json()
+        console.log(encrypted["code"])
+        let data = {};
+        try {
+          data["code"] = decryptData(encrypted["code"]);
+          data["password"] = decryptData(encrypted["password"]);
+        } catch (error) {
+          console.error("Decryption error:", error);
+        }
+        console.log("data", data)
         setDisPassCode(data["code"]+"|"+data["password"])
         updatePassCode(data["code"]+"|"+data["password"])
         setTempPassCode(data["code"] + "|" + data["password"])
