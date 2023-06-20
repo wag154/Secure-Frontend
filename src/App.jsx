@@ -13,10 +13,14 @@ function App() {
       <Route path = "/" element = {<Navbar />}>
         <Route index element = {<Home />}/>
         <Route path= "/access" element = {<Access />}/> 
-        
-        {!passCode && null
-      }
         <Route path = "*" element ={<NotFound/>}/>
+        
+        {!passCode && 
+        <Routes>
+        <Route path = "/dashboard" element = {}/>
+        <Route path = "/projects" element = {}/>
+        </Routes>
+      }
       </Route>
     </Routes>
   )
